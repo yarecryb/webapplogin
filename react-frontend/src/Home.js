@@ -7,9 +7,12 @@ export const Home = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const username = event.target.username.value;
-        const password = event.target.password.value;
-        value.onLogin(username, password).then(
+        const loginData = {
+            username: event.target.username.value,
+            password: event.target.password.value
+        };
+
+        value.onLogin(loginData).then(
             (e) => {
                 if(e === 401){
                     setError("Invalid username or password");

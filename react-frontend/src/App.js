@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import { Landing } from "./Landing";
 import { Home } from "./Home";
+import { Register } from "./Register";
 import {ProtectedRoute} from "./utils/ProtectedRoute";
 import { fakeAuth } from "./utils/FakeAuth";
 import { NavLink } from "react-router-dom";
@@ -10,18 +11,6 @@ import { AuthProvider } from "./context/AuthProvider";
 export const AuthContext = React.createContext(null);  // we will use this in other components
 
 const App = () => {
-    const [token, setToken] = React.useState(null);
-    const [user, setUser] = React.useState(null);
-
-
-    const handleLogin = async () => {
-        const token = await fakeAuth();
-        setToken(token);  
-    };
-
-    const handleLogout = () => {
-        setToken(null);
-    };
       
     return (
         <AuthProvider>
@@ -31,6 +20,7 @@ const App = () => {
         
             <Routes>
             <Route index element={<Home />} />
+            <Route index element={<Register />} />
             <Route path="landing" element={
                 <ProtectedRoute>
                     <Landing />
@@ -38,6 +28,7 @@ const App = () => {
                 } 
             />
             <Route path="home" element={<Home />} />
+            <Route path="register" element={<Register />} />
             <Route path="*" element={<p>There's nothing here: 404!</p>} />
             </Routes>
         </AuthProvider>
@@ -49,6 +40,7 @@ const Navigation = () => {
   return (
     <nav>
       <NavLink to="/home">Home</NavLink>
+      <NavLink to="/register">Register</NavLink>
       <NavLink to="/landing">Landing</NavLink>
       {value.token && (
         <button type="button" onClick={value.onLogout}>
