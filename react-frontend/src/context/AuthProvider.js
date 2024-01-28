@@ -12,6 +12,39 @@ export const AuthProvider = ({ children }) => {
     
     const connection_URL = "http://localhost:8000";
 
+    const parseCookie = (cookie, header) => {
+        let cookieArray = cookie.split(';');
+        let value = "";
+        for(let i = 0; i<cookieArray.length; i++){
+            console.log(cookieArray[i]);
+            if(cookieArray[i].trim().indexOf(header) === 0){
+                value = cookieArray[i].substring(cookieArray[i].indexOf("=")+1);
+                return value;
+            }
+        }
+        return null;
+    }
+    const checkCookie = async () =>{
+        try{
+            if(document.cookie){
+                let cookie = parseCookie(document.cookie, "token");
+                console.log(cookie);
+                const response = await axios.get(`${connection_URL}/account/loginWithToken`, 
+                    {headers: {"Authorization" : `Bearer ${cookie}`} });
+                console.log(response);
+                if(response.status === 200){
+                    setToken(cookie);
+                    navigate("/landing");
+                }else{
+                    navigate("/home");
+                }
+            }
+        } catch (error){
+            return 401;
+        }
+    };
+    
+
     const handleLogin = async (data) => {
         try {
             const response = await axios.post(`${connection_URL}/account/login`, data);
@@ -19,14 +52,14 @@ export const AuthProvider = ({ children }) => {
             if (response.status === 401) {
                 return 401;
             } else {
-                const token = await fakeAuth();
+                const token = await response.data.token;
+                document.cookie = `token=${token}`;
                 setToken(token);
                 navigate("/landing");
             }
         } catch (error){
             return 401;
         }
-        
     };
 
     const handleLogout = () => {
@@ -35,6 +68,7 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         token,
+        onPageStart: checkCookie,
         onLogin: handleLogin,
         onLogout: handleLogout,
     };

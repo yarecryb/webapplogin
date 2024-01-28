@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 import userServices from './models/user-services.js';
 import user from "./models/user.js";
+import middleware from "./middleware.js"
 
 const app = express();
 const port = 8000;
@@ -10,6 +13,29 @@ const port = 8000;
 app.use(cors());
 app.use(express.json());
 
+dotenv.config();
+process.env.TOKEN_SECRET;
+
+
+const genToken = (username) =>{
+    return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: '7d' });
+}
+
+app.get('/account/loginWithToken', async (req, res) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        const user = await userServices.getUserByToken(token);
+        if(user){
+            return res.status(200).send("logged in");
+        }else{
+            return res.status(401).send("invalid token");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error ocurred in the server.");
+    }
+});
 
 app.get('/users', async (req, res) => {
     try {
@@ -20,7 +46,6 @@ app.get('/users', async (req, res) => {
         res.status(500).send("An error ocurred in the server.");
     }
 });
-
 
 app.post('/account/register/', async (req, res) => {
     const username = req.body.username;
@@ -38,7 +63,9 @@ const addUser = async (user, res) => {
         if (result == 500) {
             return res.status(500).send("Unable to sign up");
         } else {
-            return res.status(201).send("Successful signup");
+            const token = genToken(user.username);
+
+            return res.status(201).json({"token":token});
         }
     } catch (error) {
         console.log(error);
@@ -83,7 +110,8 @@ app.post('/account/login', async (req, res) => {
 
         const correctLogin = await user.comparePassword(password);
         if (correctLogin) {
-            return res.status(200).send("login successful");
+            const token = genToken(user.username);
+            return res.status(200).json({"token":token});
         } else {
             return res.status(401).send("cannot login");
         }
