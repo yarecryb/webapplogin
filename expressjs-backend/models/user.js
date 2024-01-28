@@ -5,6 +5,7 @@ var SALT_WORK_FACTOR = 10;
 
 const UserSchema = new mongoose.Schema(
     {
+        //make usernames unique!
         username: {
             type: String,
             required: true,

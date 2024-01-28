@@ -18,7 +18,7 @@ export const Register = () => {
         try {
             const response = await axios.post(`${connection_URL}/account/register`, signupData);
 
-            if (response.status === 200){
+            if (response.status === 201){
                 value.onLogin(signupData);
             }
         } catch (error){

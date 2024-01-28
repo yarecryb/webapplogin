@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
     const handleLogin = async (data) => {
         try {
-            const response = await axios.post(`${connection_URL}/login`, data);
+            const response = await axios.post(`${connection_URL}/account/login`, data);
 
             if (response.status === 401) {
                 return 401;
