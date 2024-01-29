@@ -17,7 +17,7 @@ async function getUsers(username) {
     if (username) {
         promise = findUserByUsername(username);
     } else {
-        promise = await userModel.find();
+        promise = await userModel.find({}, 'username');
     }
     return promise;
 }

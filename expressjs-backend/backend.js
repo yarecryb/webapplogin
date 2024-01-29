@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import https from "https";
+import fs from "fs";
 
 import userServices from './models/user-services.js';
 import user from "./models/user.js";
@@ -16,17 +18,32 @@ app.use(express.json());
 dotenv.config();
 process.env.TOKEN_SECRET;
 
+// note this only works on safari not chrome
+https
+    .createServer(
+        // Provide the private and public key to the server by reading each
+        // file's content with the readFileSync() method.
+        {
+            key: fs.readFileSync("key.pem"),
+            cert: fs.readFileSync("cert.pem"),
+        },
+        app
+    )
+    .listen(port, () => {
+        console.log(`server is running at port ${port}`);
+    });
 
 const genToken = (username) =>{
     return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: '7d' });
 }
 
-app.get('/account/loginWithToken', async (req, res) => {
+app.get('/account/loginWithToken', middleware.authenticateToken, async (req, res) => {
     try {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-        const user = await userServices.getUserByToken(token);
-        if(user){
+        // const authHeader = req.headers['authorization'];
+        // const token = authHeader && authHeader.split(' ')[1];
+        // const user = await userServices.getUserByToken(token);
+
+        if(req.user){
             return res.status(200).send("logged in");
         }else{
             return res.status(401).send("invalid token");
@@ -140,8 +157,4 @@ app.delete('/account/delete', async (req, res) => {
         console.log(error);
         return res.status(500).send("An error ocurred in the server.");
     }
-});
-
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
 });

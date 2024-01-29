@@ -37,14 +37,17 @@ const App = () => {
 
 const Navigation = () => {
     const { value } = useAuth();
+
     useEffect(() =>{
         value.onPageStart();
-    });
+    }, []);
 
     return (
         <nav>
             <NavLink to="/home">Home</NavLink>
-            <NavLink to="/register">Register</NavLink>
+            {!value.token && (
+                <NavLink to="/register">Register</NavLink>
+            )}
             <NavLink to="/landing">Landing</NavLink>
             {value.token && (
                 <button type="button" onClick={value.onLogout}>

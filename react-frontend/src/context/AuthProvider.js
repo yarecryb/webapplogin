@@ -1,22 +1,19 @@
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fakeAuth } from "../utils/FakeAuth";
 import axios from 'axios';
 
 const AuthContext = createContext({});
-// const axios = require('axios').default;
 
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [token, setToken] = useState(null);
     
-    const connection_URL = "http://localhost:8000";
+    const connection_URL = "https://localhost:8000";
 
     const parseCookie = (cookie, header) => {
         let cookieArray = cookie.split(';');
         let value = "";
         for(let i = 0; i<cookieArray.length; i++){
-            console.log(cookieArray[i]);
             if(cookieArray[i].trim().indexOf(header) === 0){
                 value = cookieArray[i].substring(cookieArray[i].indexOf("=")+1);
                 return value;
@@ -28,10 +25,8 @@ export const AuthProvider = ({ children }) => {
         try{
             if(document.cookie){
                 let cookie = parseCookie(document.cookie, "token");
-                console.log(cookie);
                 const response = await axios.get(`${connection_URL}/account/loginWithToken`, 
                     {headers: {"Authorization" : `Bearer ${cookie}`} });
-                console.log(response);
                 if(response.status === 200){
                     setToken(cookie);
                     navigate("/landing");
@@ -63,6 +58,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const handleLogout = () => {
+        document.cookie = `token=`;
         setToken(null);
     };
 

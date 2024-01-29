@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "./context/AuthProvider";
-import axios from 'axios';
+import axios from "axios";
 
 export const Register = () => {
     const [error, setError] = useState("");
