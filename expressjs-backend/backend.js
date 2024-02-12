@@ -8,12 +8,17 @@ import fs from "fs";
 import userServices from './models/user-services.js';
 import user from "./models/user.js";
 import middleware from "./middleware.js"
+import authRouter from "./routes/oath.js";
+import requestRouter from "./routes/request.js";
 
 const app = express();
 const port = 8000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/oath", authRouter);
+app.use("/request", requestRouter);
 
 dotenv.config();
 process.env.TOKEN_SECRET;
@@ -158,3 +163,4 @@ app.delete('/account/delete', async (req, res) => {
         return res.status(500).send("An error ocurred in the server.");
     }
 });
+export default genToken;
