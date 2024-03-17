@@ -7,6 +7,13 @@ export const Landing = () => {
     const connection_URL = "https://localhost:8000";
     const [users, setUsers] = useState([{}]);
     useEffect(() =>{
+        const queryParameters = new URLSearchParams(window.location.search);
+        const googleToken = queryParameters.get("token");
+
+        if (googleToken) {
+            localStorage.setItem("TOKEN_KEY", googleToken);
+        }
+
         getUserData().then( (res) =>{
             if(res.status === 200){
                 setUsers(res.data.user_list);
@@ -16,7 +23,11 @@ export const Landing = () => {
 
     const getUserData = async () => {
         try {
-            const response = await axios.get(`${connection_URL}/users`);
+            const response = await axios.get(`${connection_URL}/users`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("TOKEN_KEY")}`,
+                },
+            });
             return response;
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -37,7 +48,7 @@ export const Landing = () => {
             </>
         )
     }
-
+    
     return (
         <>
             <h2>Landing (Protected)</h2>

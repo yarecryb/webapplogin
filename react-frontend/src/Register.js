@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const Register = () => {
     const [error, setError] = useState("");
-    const connection_URL = "http://localhost:8000";
+    const connection_URL = "https://localhost:8000";
     const { value } = useAuth();
 
     const handleSubmit = async (event) => {

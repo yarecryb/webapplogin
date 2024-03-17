@@ -14,7 +14,10 @@ import requestRouter from "./routes/request.js";
 const app = express();
 const port = 8000;
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://localhost:3000'
+}));
+
 app.use(express.json());
 
 app.use("/oath", authRouter);
@@ -23,26 +26,30 @@ app.use("/request", requestRouter);
 dotenv.config();
 process.env.TOKEN_SECRET;
 
+app.listen(port, () => {
+    console.log(`Example app listening at https://localhost:${port}`);
+});
+
 // note this only works on safari not chrome
-https
-    .createServer(
-        // Provide the private and public key to the server by reading each
-        // file's content with the readFileSync() method.
-        {
-            key: fs.readFileSync("key.pem"),
-            cert: fs.readFileSync("cert.pem"),
-        },
-        app
-    )
-    .listen(port, () => {
-        console.log(`server is running at port ${port}`);
-    });
+// https
+//     .createServer(
+//         // Provide the private and public key to the server by reading each
+//         // file's content with the readFileSync() method.
+//         {
+//             key: fs.readFileSync("key.pem"),
+//             cert: fs.readFileSync("cert.pem"),
+//         },
+//         app
+//     )
+//     .listen(port, () => {
+//         console.log(`server is running at port ${port}`);
+//     });
 
 const genToken = (username) =>{
     return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: '7d' });
 }
 
-app.get('/account/loginWithToken', middleware.authenticateToken, async (req, res) => {
+app.post('/account/loginWithToken', middleware.authenticateToken, async (req, res) => {
     try {
         // const authHeader = req.headers['authorization'];
         // const token = authHeader && authHeader.split(' ')[1];
@@ -70,6 +77,7 @@ app.get('/users', async (req, res) => {
 });
 
 app.post('/account/register/', async (req, res) => {
+    console.log(req.body);
     const username = req.body.username;
     const pass = req.body.password;
     if (pass === pass.toLowerCase()) {

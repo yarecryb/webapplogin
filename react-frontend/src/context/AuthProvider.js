@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
         try{
             if(document.cookie){
                 let cookie = parseCookie(document.cookie, "token");
-                const response = await axios.get(`${connection_URL}/account/loginWithToken`, 
+                const response = await axios.post(`${connection_URL}/account/loginWithToken`, 
                     {headers: {"Authorization" : `Bearer ${cookie}`} });
                 if(response.status === 200){
                     setToken(cookie);
